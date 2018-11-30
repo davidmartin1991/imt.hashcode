@@ -1,9 +1,8 @@
 var _ = require('lodash');
 
-var helpers = require('./helpers.js');
-var get_score = require('./get_score');
+var helpers = require('./helpers.js')
 
-const USERNAME = "TEAM_BALAYETTE";
+const USERNAME = "JE_DOIS_METTRE_MON_PRENOM";
 const POSITION_ORIGINE = {
     lat: 0.5,
     lng: 0.5
@@ -19,9 +18,6 @@ var problems = {
     problem2: {
         problem_id: 'problem2',
         orders: helpers.parseCsv('problem2.csv')
-
-
-
     },
     // 3500 commandes un peu spéciales
     problem3: {
@@ -38,12 +34,11 @@ var solve_problem_dumb = function (problem) {
     };
 
     var pos = POSITION_ORIGINE;
-    var orders = problems.problem1.orders.sort(compareOrder);
 
-    for(var i=0 ; i<orders.length ; i++)
-    {
-        console.log(i);
-        order = orders[i];
+    while(problem.orders.length > 0) {
+        console.log(problem.orders.length);
+        // On prend la commande la plus proche et on l'ajoute au trajet du livreur
+        var order = findClosestOrder(problem.orders, pos);
         solution.orders.push(order.order_id);
 
         // On garde en mémoire la nouvelle position du livreur
@@ -51,6 +46,7 @@ var solve_problem_dumb = function (problem) {
         pos.lng = order.pos_lng;
 
         // On retire la commande qui vient d'être réalisé
+        problem.orders.splice(problem.orders.indexOf(order), 1);
     }
     return solution;
 };
@@ -62,9 +58,5 @@ var findClosestOrder = function (orders, pos) {
     return orders[orders.length-1];
 }
 
-var compareOrder = function (order1 , order2) {
-    return parseInt(order2.amount) - parseInt(order1.amount);
-}
-
-var solution = solve_problem_dumb(problems.problem1);
+var solution = solve_problem_dumb(problems.problem3);
 helpers.send_solution(solution);
